@@ -1,0 +1,205 @@
+import React, { useRef, useState, useEffect } from 'react'
+import './Home.css'
+import axios from 'axios'
+import { Link } from 'react-router-dom';
+
+const regForName = RegExp(/^[a-zA-Z]/);
+const URL = "http://localhost:3001/budget"
+function Home() {
+    const [data, setData] = useState({})
+    const [user, setuserdata] = useState([])
+    const [index, setindex] = useState(0);
+    const [togglebtn, setToggleBtn] = useState(true)
+    const [budget, setbudget] = useState(0)
+    const [expense, setexpenses] = useState(0)
+    const [balance, setbalance] = useState(0)
+    const titleRef = useRef(0)
+    const amountRef = useRef(0)
+    const budgetRef = useRef(0)
+
+
+    const addBudget = () => {
+        const user = JSON.parse(sessionStorage.getItem('mycart'));
+        let budg = parseFloat(budgetRef.current.value)
+        if (budg > 0) {
+            user.total = parseFloat(user.total + budg)
+            sessionStorage.setItem('mycart', JSON.stringify(user))
+            budgetRef.current.value = ""
+        }
+        else {
+            alert("Budget Shold be more than Zer0")
+        }
+
+    }
+    const addExpense = () => {
+      
+        const user = JSON.parse(sessionStorage.getItem('mycart'))
+        const usertitle = titleRef.current.value
+        const useramount = parseFloat(amountRef.current.value)
+        if (usertitle != null && regForName.test(usertitle)) {
+            sessionStorage.setItem('mycart', JSON.stringify(user))
+           
+            if (useramount > 0 || (budget-expense)<=0)
+             {
+                
+                const expense = { title: usertitle, amount: useramount }
+                user.expense = [...user.expense, expense]
+                
+                sessionStorage.setItem('mycart', JSON.stringify(user))
+                titleRef.current.value = ""
+                amountRef.current.value = ""
+               
+            }
+
+
+            
+            else {
+                alert("Budget Shold be more than Zer0 and balane is less than 0")
+            }
+        }
+        else {
+            alert("Please enter correct title")
+        }
+    }
+
+    const del = (index) => {
+        const user = JSON.parse(sessionStorage.getItem('mycart'))
+        const res = window.confirm("Do You really want to delele this?")
+        if (res == true) {
+            user.expense.splice(index, 1)
+            setData({ ...user });
+            sessionStorage.setItem('mycart', JSON.stringify(user));
+        }
+        const user1 = JSON.parse(sessionStorage.getItem('mycart'))
+        const userdata = user1.expense
+        setuserdata([...userdata])
+    }
+    const edit = () => {
+        let user = JSON.parse(sessionStorage.getItem('mycart'));
+        let temp = user.expense
+        temp[index].title = titleRef.current.value
+        temp[index].amount = parseFloat(amountRef.current.value)
+        user.expense = temp
+        sessionStorage.setItem('mycart', JSON.stringify(user))
+        setuserdata([...user.expense])
+        titleRef.current.value = null
+        amountRef.current.value = null
+        setToggleBtn(true)
+    }
+
+    const update = (index, data) => {
+        titleRef.current.value = data.title
+        amountRef.current.value = data.amount
+        setindex(index)
+        setToggleBtn(false)
+    }
+    useEffect(() => {
+        if (sessionStorage.getItem('mycart') !== undefined) {
+            const user1 = JSON.parse(sessionStorage.getItem('mycart'))
+            const userd = user1.expense
+            setuserdata([...userd])
+        }
+    },[])
+    useEffect(()=>{
+        
+        const user = JSON.parse(sessionStorage.getItem('mycart'))
+        setbudget(user.total)
+        let exp = 0
+        user.expense.map(ele=>{
+            exp=ele.amount+exp
+        })
+        setexpenses(exp)
+        setbalance(budget-expense)
+        user.balance = balance
+        sessionStorage.setItem('mycart', JSON.stringify(user))
+    
+    
+
+    })
+
+    return (
+        <>
+            <div className="container-fluid">
+                <h3 className="text-center">Budget Calculator</h3>
+                {sessionStorage.getItem('mycart') !== undefined ?
+                    <div className="row add-budget">
+                        <div className="col-lg-4 home-left">
+                            <div className="budget-contain">
+
+                                <input type="number" className="form-control" placeholder="Enter Budget" ref={budgetRef} />
+                                <button className="btn btn-outline-success mt-2" onClick={addBudget} >Add Budget</button>
+
+                            </div>
+
+
+                            <div className="container mt-4 expense-contain ">
+                                <input type="text" className="form-control" placeholder="Enter Your Expense" ref={titleRef} />
+                                <input type="number" className="form-control mt-2" placeholder="Enter Your Amount" ref={amountRef} />
+                                {/* <button className="btn btn-outline-warning mt-2" onClick={addExpense}>Add</button>  */}
+                                {togglebtn ? <button className="btn btn-outline-warning mt-2" onClick={addExpense}>Add</button> : <button onClick={edit} className="btn btn-outline-warning mt-2">Edit</button>}
+                            </div>
+                        </div>
+                        <div className="col-lg-7 home-right">
+                            <div className="container display-budget">
+                                <div className="row ml-2">
+                                    <div className="col-lg-4">
+                                        <span style={{ fontSize: "18px", fontWeight: "bold", letterSpacing: "1px" }}>  Budget:</span><br />
+                                        <i class="fa fa-money" style={{ fontSize: "50px", color: "green" }}></i><br /><span style={{ fontSize: "18px", fontWeight: "bold", letterSpacing: "1px" }}>  Rs.{budget}</span>
+
+                                    </div>
+                                    <div className="col-lg-4">
+
+                                        <span style={{ fontSize: "18px", fontWeight: "bold", letterSpacing: "1px" }}>Expenses:</span><br />
+
+                                        <i class="fa fa-credit-card" style={{ fontSize: "50px", color: "green" }}></i><br /><span style={{ fontSize: "18px", fontWeight: "bold", letterSpacing: "1px" }}>  Rs.{expense}</span>
+
+                                    </div>
+                                    <div className="col-lg-4">
+                                        <span style={{ fontSize: "18px", fontWeight: "bold", letterSpacing: "1px" }}>Balance:</span><br />
+
+                                        <i class="fa fa-inr" style={{ fontSize: "50px", color: "green" }}></i><br />
+                                        <span style={{ fontSize: "18px", fontWeight: "bold", letterSpacing: "1px" }}>  Rs.{balance}</span>
+                                    </div>
+
+                                </div>
+                                {/* <div className="text-right"><button className="btn btn-primary" onClick={log}>Save Data</button><br /></div> */}
+
+                            </div>
+                            <div className="container data-contain">
+                                <table className="table">
+                                    <thead className="bg-primary text-center">
+                                        <tr>
+                                            <th scope="col">Title</th>
+                                            <th scope="col">Amount</th>
+                                            <th scope="col">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {
+                                            user.length > 0 ?
+                                                user.map((data, index) => (
+                                                    <tr className="text-center">
+                                                        <td>{data.title}</td><td>{data.amount}</td>
+                                                        <td>
+                                                            <button className="btn btn-danger " onClick={() => del(index)}>delete</button>
+                                                            <button className="btn btn-warning ml-2" onClick={() => update(index, data)}>Update</button>
+                                                        </td>
+                                                    </tr>
+                                                )) : <tr> <td colSpan="3" style={{fontSize:25, fontWeight:"bold"}}>  No Data to Display </td> </tr>
+
+
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+
+
+                        </div>
+                    </div> : <Link to="/"></Link>}
+            </div>
+
+        </>
+    )
+}
+
+export default Home

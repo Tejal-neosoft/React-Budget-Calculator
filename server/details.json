@@ -1,0 +1,68 @@
+{
+  "budget": [
+    {
+      "fname": "abc",
+      "lname": "def",
+      "username": "abcd",
+      "email": "abc11@gmail.com",
+      "pass": "$2a$10$Q/AqZ/CCNxPp/SVuDbw.Q.iG1rZY.44QRjiNX80jGr8LeNRdvW0ym",
+      "cpass": "Abc@123",
+      "expense": [
+        {
+          "title": "te",
+          "amount": 2000
+        },
+        {
+          "title": "apple",
+          "amount": 300
+        }
+      ],
+      "total": 4000,
+      "balance": 1700,
+      "id": 1
+    },
+    {
+      "fname": "Tejal",
+      "lname": "Supe",
+      "uername": "101564531509405454116",
+      "email": "supetejalc@gmail.com",
+      "pass": "socialLogin",
+      "total": 300,
+      "expense": [
+        {
+          "title": "tee",
+          "amount": 100
+        }
+      ],
+      "balance": 200,
+      "id": 2
+    },
+    {
+      "fname": "Tejal",
+      "lname": "Supe",
+      "uername": "107309664069249300832",
+      "email": "tejal123supe.od@gmail.com",
+      "pass": "socialLogin",
+      "total": 300,
+      "expense": [
+        {
+          "title": "te",
+          "amount": 100
+        }
+      ],
+      "balance": 200,
+      "id": 3
+    },
+    {
+      "fname": "Tejal",
+      "lname": "Supe",
+      "uername": "112320383021855011430",
+      "email": "tejalsupe.neosoft@gmail.com",
+      "pass": "socialLogin",
+      "total": 0,
+      "expense": [],
+      "balance": 0,
+      "id": 4
+    }
+  ]
+}
